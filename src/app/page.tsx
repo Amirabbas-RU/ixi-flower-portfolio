@@ -228,7 +228,7 @@ export default function Home() {
       </section>
 
       {/* ─── Skills Section ─── */}
-      <section id="skills" className="relative z-10 px-4 sm:px-6 pt-16 sm:pt-28 pb-20 sm:pb-32">
+      <section id="skills" className="relative z-10 px-4 sm:px-6 pt-16 sm:pt-28 pb-12 sm:pb-16">
         <StaggeredGrid
           bentoItems={skillItems}
           centerText="SKILLS"
@@ -236,7 +236,7 @@ export default function Home() {
       </section>
 
       {/* ─── Education & Courses Section ─── */}
-      <section id="education" className="relative z-10 px-4 sm:px-8 lg:px-16 pt-8 pb-20 sm:pb-32">
+      <section id="education" className="relative z-10 px-4 sm:px-8 lg:px-16 pt-4 pb-20 sm:pb-32">
         <div className="w-full max-w-5xl mx-auto">
           <motion.h2
             className="text-2xl sm:text-3xl font-bold text-white mb-10 text-center"
