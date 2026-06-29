@@ -480,6 +480,7 @@ export default function ProfileCard({
                           display: "block",
                           borderRadius: "50%",
                           pointerEvents: "auto",
+                          filter: "brightness(0.55) saturate(0.9)",
                         }}
                         onError={(e) => {
                           const t = e.target as HTMLImageElement;
