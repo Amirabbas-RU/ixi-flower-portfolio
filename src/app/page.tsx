@@ -179,7 +179,7 @@ export default function Home() {
             <div className="flex items-center gap-3 sm:gap-4 mb-2 mt-3">
               <span className="w-8 sm:w-12 h-px bg-zinc-700" />
               <span className="text-xs sm:text-sm text-zinc-600 tracking-[0.2em] uppercase font-light">
-                Developer
+                Developer &amp; Infrastructure
               </span>
               <span className="w-8 sm:w-12 h-px bg-zinc-700" />
             </div>
