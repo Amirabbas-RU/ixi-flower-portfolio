@@ -96,7 +96,7 @@ export function MorphText({
         {/* word rotator */}
         <div
           className="morph-word-rotator relative flex items-center justify-center"
-          style={{ height: "1.2em", minWidth: "14ch" }}
+          style={{ height: "1.2em", minWidth: "min(22ch, 85vw)" }}
         >
           {words.map((word, i) => (
             <span
@@ -141,8 +141,6 @@ export function MorphText({
 
       {/* ── Scoped keyframes ──────────────────────────────────────── */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap');
-
         @keyframes morph-word-rotate {
           0% {
             opacity: 0;
