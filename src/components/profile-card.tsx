@@ -435,17 +435,18 @@ export default function ProfileCard({
               }}
             >
               <img
-                className="w-full absolute left-1/2 bottom-[-1px] will-change-transform transition-transform duration-[120ms] ease-out"
-                src={avatarUrl}
-                alt={`${name || "User"} avatar`}
-                loading="lazy"
-                style={{
-                  transformOrigin: "50% 100%",
-                  transform:
-                    "translateX(calc(-50% + (var(--pointer-from-left) - 0.5) * 6px)) translateZ(0) scaleY(calc(1 + (var(--pointer-from-top) - 0.5) * 0.02)) scaleX(calc(1 + (var(--pointer-from-left) - 0.5) * 0.01))",
-                  borderRadius: cardRadius,
-                  backfaceVisibility: "hidden",
-                }}
+              className="w-full absolute left-1/2 bottom-[-1px] will-change-transform transition-transform duration-[120ms] ease-out"
+              src={avatarUrl}
+              alt={`${name || "User"} avatar`}
+              loading="lazy"
+              style={{
+                transformOrigin: "50% 100%",
+                transform:
+                  "translateX(calc(-50% + (var(--pointer-from-left) - 0.5) * 6px)) translateZ(0) scaleY(calc(1 + (var(--pointer-from-top) - 0.5) * 0.02)) scaleX(calc(1 + (var(--pointer-from-left) - 0.5) * 0.01))",
+                borderRadius: cardRadius,
+                backfaceVisibility: "hidden",
+                filter: "brightness(0.55) saturate(0.9)",
+              }}
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = "none";
                 }}
