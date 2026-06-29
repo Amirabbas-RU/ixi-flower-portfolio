@@ -439,11 +439,10 @@ export default function Home() {
                 wordAnimationEnd="center center"
               >
                 I&apos;m Amirabbas Rouintan — a 19-year-old self-taught developer
-                from Karaj, Iran. I&apos;ve been coding since I was 12, building
-                everything from backend infrastructure to networking tools.
-                Working with Python, Go, TypeScript, and system-level
-                engineering — crafting APIs, automating infrastructure, and
-                diving deep into network protocols. Currently
+                from Karaj, Iran. I&apos;ve been coding since I was 12, working
+                with Python, Go, TypeScript, and diving deep into networking
+                and cybersecurity. Building APIs, automating infrastructure,
+                securing systems, and exploring network protocols. Currently
                 working at Ecode team as a backend and infrastructure developer.
               </ScrollReveal>
             </motion.div>
