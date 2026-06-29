@@ -5,10 +5,11 @@ import ProfileCard from "@/components/profile-card";
 import TypingKeyboard from "@/components/typing-keyboard";
 import StaggeredGrid from "@/components/staggered-grid";
 import MagicRings from "@/components/magic-rings";
-import AnimateCode from "@/components/animate-code";
 import DecryptedText from "@/components/decrypted-text";
+import AnimateCode from "@/components/animate-code";
 import ScrollReveal from "@/components/scroll-reveal";
 import ProjectDialog from "@/components/project-dialog";
+import { CreepyButton } from "@/components/creepy-button";
 import { motion } from "framer-motion";
 import {
   FaReact,
@@ -369,9 +370,10 @@ export default function Home() {
               >
                 I&apos;m Amirabbas Rouintan — a 19-year-old self-taught developer
                 from Karaj, Iran. I&apos;ve been coding since I was 12, building
-                everything from mobile apps to backend infrastructure.
-                Specializing in React, TypeScript, Kotlin, and C#, I love
-                creating beautiful, functional digital experiences. Currently
+                everything from backend infrastructure to networking tools.
+                Working with Python, Go, TypeScript, and system-level
+                engineering — crafting APIs, automating infrastructure, and
+                diving deep into network protocols. Currently
                 working at Ecode team as a backend and infrastructure developer.
               </ScrollReveal>
             </motion.div>
@@ -529,6 +531,22 @@ const wisdom = (moments: Moment[]): string => {
               </motion.button>
             ))}
           </div>
+
+          {/* View All Projects Button */}
+          <motion.div
+            className="flex justify-center mt-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+          >
+            <CreepyButton
+              onClick={() => window.open("https://github.com/ixiflower", "_blank", "noopener noreferrer")}
+              coverClassName="bg-violet-600"
+            >
+              View All Projects
+            </CreepyButton>
+          </motion.div>
         </div>
       </section>
 
