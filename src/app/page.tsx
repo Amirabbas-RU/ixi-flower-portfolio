@@ -250,39 +250,95 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {[
               {
-                title: "Self-Taught Developer",
-                subtitle: "Since age 12–13",
+                title: "The Modern Python 3 Bootcamp",
+                subtitle: "Udemy",
                 items: [
-                  "6+ years of continuous self-learning",
-                  "Programming Advanced (University)",
-                  "English &amp; Farsi classes",
+                  "Python fundamentals through advanced topics",
+                  "OOP, decorators, generators, testing",
+                  "Certificate: UC-9842c80b-e377-4960-b027-83a31256595d",
                 ],
+                cert: "https://www.udemy.com/certificate/UC-9842c80b-e377-4960-b027-83a31256595d/",
               },
               {
                 title: "OWASP Zero",
-                subtitle: "White-Hat Hacking — In Progress",
+                subtitle: "voorivex.academy",
                 items: [
                   "Web security fundamentals",
                   "OWASP Top 10 vulnerabilities",
                   "Ethical hacking methodology",
                 ],
+                cert: "https://voorivex.academy/classes/owasp-zero",
               },
               {
-                title: "PortSwigger Academy",
-                subtitle: "Web Security Labs",
+                title: "Certified Ethical Hacker (CEH)",
+                subtitle: "maktabkhooneh",
                 items: [
-                  "Hands-on lab exercises",
-                  "SQL injection, XSS, CSRF",
-                  "Authentication &amp; access control",
+                  "Ethical hacking methodology & tools",
+                  "Reconnaissance, scanning, exploitation",
+                  "Post-exploitation & reporting",
                 ],
               },
               {
-                title: "Shopify Development",
-                subtitle: "Ecommerce Platform",
+                title: "Security Plus",
+                subtitle: "maktabkhooneh",
                 items: [
-                  "Liquid templating &amp; theme dev",
-                  "Storefront API &amp; Hydrogen",
-                  "Custom app development",
+                  "Threats, attacks & vulnerabilities",
+                  "Architecture & design",
+                  "Cryptography & PKI",
+                ],
+              },
+              {
+                title: "LPIC-1 Bootcamp",
+                subtitle: "Jadi",
+                items: [
+                  "Linux system administration",
+                  "Command line, shell scripting",
+                  "System maintenance & security",
+                ],
+              },
+              {
+                title: "CompTIA Network+",
+                subtitle: "Arjang",
+                items: [
+                  "Networking concepts & protocols",
+                  "Infrastructure & troubleshooting",
+                  "Network security fundamentals",
+                ],
+              },
+              {
+                title: "The Modern Python",
+                subtitle: "Arjang",
+                items: [
+                  "Advanced Python programming",
+                  "AsyncIO, networking, APIs",
+                  "Real-world project-based learning",
+                ],
+              },
+              {
+                title: "Docker - Kubernetes",
+                subtitle: "DevOps",
+                items: [
+                  "Containerization with Docker",
+                  "Orchestration with Kubernetes",
+                  "CI/CD pipeline integration",
+                ],
+              },
+              {
+                title: "nmap",
+                subtitle: "Udemy",
+                items: [
+                  "Network discovery & scanning",
+                  "NSE scripting engine",
+                  "Vulnerability assessment techniques",
+                ],
+              },
+              {
+                title: "REACT.JS Course",
+                subtitle: "Frontend",
+                items: [
+                  "Modern React with hooks & context",
+                  "State management & routing",
+                  "Component design patterns",
                 ],
               },
             ].map((course, i) => (
@@ -299,6 +355,20 @@ export default function Home() {
                 </h3>
                 <p className="text-xs sm:text-sm text-zinc-500 mb-3">
                   {course.subtitle}
+                  {course.cert && (
+                    <a
+                      href={course.cert}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 ml-2 text-violet-500 hover:text-violet-400 transition-colors text-[11px]"
+                    >
+                      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 2v20M2 12h20"/>
+                        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/>
+                      </svg>
+                      Certificate ↗
+                    </a>
+                  )}
                 </p>
                 <ul className="space-y-1.5">
                   {course.items.map((item) => (
