@@ -38,6 +38,7 @@ export interface BentoItem {
   icon: React.ReactNode;
   content?: React.ReactNode;
   color?: string;
+  bgImage?: string;
 }
 
 export interface StaggeredGridProps {
@@ -227,6 +228,17 @@ export default function StaggeredGrid({
                             isActive ? "border-zinc-400/50" : "border-zinc-600/40"
                           )}
                         />
+
+                        {/* Background image */}
+                        {bentoItem.bgImage && (
+                          <div className="absolute inset-0 overflow-hidden">
+                            <div
+                              className="absolute inset-0 bg-cover bg-center"
+                              style={{ backgroundImage: `url(${bentoItem.bgImage})` }}
+                            />
+                            <div className="absolute inset-0 bg-black/65" />
+                          </div>
+                        )}
 
                         {/* Active Content */}
                         <div

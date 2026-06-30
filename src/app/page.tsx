@@ -24,6 +24,7 @@ const skillItems = [
     subtitle: "React · Next.js · TS · Tailwind",
     description: "Modern, reactive UIs with the best tools in the ecosystem.",
     icon: <FrontendIcon className="w-5 h-5 sm:w-7 sm:h-7" />,
+    bgImage: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80",
   },
   {
     id: 2,
@@ -31,6 +32,7 @@ const skillItems = [
     subtitle: "Network Security · Analysis · Protocols",
     description: "Securing networks, analyzing threats, and building resilient infrastructure.",
     icon: <NetworkSecurityIcon className="w-5 h-5 sm:w-7 sm:h-7" />,
+    bgImage: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&q=80",
   },
   {
     id: 3,
@@ -38,6 +40,7 @@ const skillItems = [
     subtitle: "Node.js · C# · Python",
     description: "Scalable APIs, databases, and server-side logic.",
     icon: <BackendIcon className="w-5 h-5 sm:w-7 sm:h-7" />,
+    bgImage: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
   },
 ];
 
