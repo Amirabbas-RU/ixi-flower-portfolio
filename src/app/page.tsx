@@ -317,13 +317,6 @@ export default function Home() {
               />
             </div>
 
-            {/* ─── Description ─── */}
-            <p className="mt-8 max-w-lg text-sm sm:text-base text-zinc-500 leading-relaxed">
-              Developer crafting digital experiences with code and design.
-              Building things at the intersection of art and engineering.
-              Passionate about React, TypeScript, and creating beautiful
-              interfaces.
-            </p>
           </div>
         </div>
 
@@ -554,6 +547,115 @@ const wisdom = (moments: Moment[]): string => {
             typingSpeed={25}
             className="w-full"
           />
+        </div>
+      </section>
+
+      {/* ─── YouTube Video Section ─── */}
+      <section className="relative z-10 px-4 sm:px-8 lg:px-16 py-20 sm:py-32 overflow-hidden">
+        {/* Ambient glow orbs */}
+        <div className="absolute inset-0 -z-10 pointer-events-none">
+          <motion.div
+            className="absolute top-1/4 left-[15%] w-[500px] h-[500px] rounded-full bg-red-500/[0.04] blur-[120px]"
+            animate={{ x: [0, 30, -20, 0], y: [0, -20, 30, 0], scale: [1, 1.1, 0.95, 1] }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute bottom-1/3 right-[10%] w-[400px] h-[400px] rounded-full bg-amber-500/[0.03] blur-[100px]"
+            animate={{ x: [0, -30, 20, 0], y: [0, 30, -10, 0], scale: [1, 0.95, 1.08, 1] }}
+            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </div>
+
+        <div className="w-full max-w-5xl mx-auto">
+          {/* Section badge */}
+          <motion.div
+            className="flex justify-center mb-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1 text-xs text-zinc-500 border border-zinc-800 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+              Latest Video
+            </div>
+          </motion.div>
+
+          <motion.h2
+            className="text-2xl sm:text-3xl font-bold text-white mb-3 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            YouTube
+          </motion.h2>
+
+          <motion.p
+            className="text-sm text-zinc-500 mb-10 text-center max-w-md mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+          >
+            Tutorials, tools, and things I learn — captured on video.
+          </motion.p>
+
+          {/* Main video card */}
+          <motion.div
+            className="relative max-w-4xl mx-auto"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+          >
+            {/* Animated gradient border glow */}
+            <div className="absolute -inset-[3px] bg-gradient-to-br from-red-500/30 via-amber-500/20 to-red-600/30 rounded-2xl blur-sm" />
+            <div className="absolute -inset-[6px] bg-gradient-to-br from-red-500/10 via-transparent to-amber-500/10 rounded-2xl blur-xl" />
+
+            {/* Video container */}
+            <div className="relative rounded-2xl overflow-hidden border border-zinc-700/50 bg-black shadow-2xl">
+              <div className="absolute inset-0 rounded-2xl pointer-events-none z-10 border border-white/[0.06]" />
+              <div className="relative aspect-video">
+                <iframe
+                  src="https://www.youtube.com/embed/NQJa6Las1Jw"
+                  title="پیدا کردن هر فایلی زیر ۱ ثانیه! 😳⚡"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full"
+                />
+              </div>
+            </div>
+
+            {/* Video info bar */}
+            <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-2">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center overflow-hidden flex-shrink-0">
+                  <span className="text-sm font-bold text-zinc-400">i</span>
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-medium text-white leading-tight truncate">
+                    پیدا کردن هر فایلی زیر ۱ ثانیه! 😳⚡
+                  </h3>
+                  <p className="text-xs text-zinc-500 mt-0.5">
+                    ixi_flower · YouTube
+                  </p>
+                </div>
+              </div>
+              <a
+                href="https://youtube.com/@ixi_flower0"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600/10 border border-red-600/30 text-red-400 hover:bg-red-600/20 hover:border-red-600/50 transition-all duration-300 text-sm font-medium shrink-0 self-start sm:self-auto"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
+                Subscribe
+                <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+              </a>
+            </div>
+          </motion.div>
         </div>
       </section>
 
