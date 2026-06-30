@@ -130,6 +130,17 @@ const projects = [
     langColor: "#3776ab",
     gradient: "from-fuchsia-500/20 via-purple-500/10 to-transparent",
   },
+  {
+    title: "Sofra",
+    desc: "Premium Shopify Hydrogen furniture storefront — handcrafted pieces with Shopify's Storefront API, full cart system, collections, and a soulful design aesthetic.",
+    tech: ["Hydrogen", "Shopify", "React Router", "Tailwind"],
+    href: "https://sofra-three.vercel.app",
+    site: "https://sofra-three.vercel.app",
+    stars: 0,
+    lang: "TypeScript",
+    langColor: "#3178c6",
+    gradient: "from-stone-500/20 via-amber-500/10 to-transparent",
+  },
 ];
 
 const courses = [
