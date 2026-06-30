@@ -162,7 +162,6 @@ const courses = [
       "OWASP Top 10 vulnerabilities",
       "Ethical hacking methodology",
     ],
-    cert: "https://voorivex.academy/classes/owasp-zero",
   },
   {
     title: "Certified Ethical Hacker (CEH)",
