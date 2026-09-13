@@ -185,16 +185,17 @@ export default function AdminIndex() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
-      <div className="flex items-start justify-between gap-4">
+    <div className="max-w-3xl mx-auto px-4 py-10 admin-fade">
+      <div className="flex items-start justify-between gap-4 admin-fade">
         <div>
           <h1 className="text-xl font-bold text-zinc-100">Admin</h1>
           <p className="text-sm text-zinc-500 mt-1">ixi_flower — owner only{email ? ` · ${email}` : ''}</p>
         </div>
-        <button onClick={logout} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-zinc-800 text-zinc-500 hover:text-red-400 hover:border-red-500/40 hover:bg-red-950/20 hover:shadow-[0_0_12px_rgba(239,68,68,0.25)] transition-all"><LogOut className="h-3.5 w-3.5" /> Logout</button>
+        <button onClick={logout} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-zinc-800 text-zinc-500 hover:text-red-400 hover:border-red-500/40 hover:bg-red-950/20 hover:shadow-[0_0_12px_rgba(239,68,68,0.25)] transition-all md:hidden"><LogOut className="h-3.5 w-3.5" /> Logout</button>
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-3">
+      {/* sidebar already has Blog / Site content / Back to site — hide these on desktop */}
+      <div className="mt-6 flex flex-wrap gap-3 md:hidden admin-fade admin-fade-d1">
         <Link href="/admin/blog" className="px-4 py-2 bg-zinc-100 text-zinc-900 text-sm hover:bg-white">Manage blog →</Link>
         <Link href="/admin/site-content" className="px-4 py-2 border border-zinc-800 text-sm text-zinc-100 hover:bg-zinc-800 hover:border-zinc-700">Site content →</Link>
         <Link href="/" className="px-4 py-2 border border-zinc-800 text-sm text-zinc-400 hover:text-zinc-100 hover:border-zinc-700">Back to site</Link>

@@ -228,11 +228,6 @@ function ProjectCard({ p }: { p: Project }) {
             className="object-cover w-full h-full opacity-80 group-hover:opacity-100 transition-opacity"
           />
         ) : null}
-        {iframeBlocked && !imgFailed && (
-          <div className="absolute inset-0 flex items-end justify-center pb-2 pointer-events-none">
-            <span className="text-[9px] text-zinc-300 border border-zinc-600 bg-zinc-900/80 px-2 py-0.5">iframe blocked — showing preview image</span>
-          </div>
-        )}
         <div className="absolute top-0 left-0 bg-zinc-900/80 px-2 py-1 text-[10px] text-green-400">{p.status}</div>
         <div className="absolute top-0 right-0 bg-zinc-900/80 p-1 text-zinc-400">
           <IconGithub className="h-3 w-3" />
@@ -768,7 +763,7 @@ export default function Home() {
           <div className="text-[10px] text-zinc-600 tracking-[0.3em] mt-1">ixi_flower — amirabbas rouintan</div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-3 auto-rows-min">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-3 auto-rows-min md:items-stretch">
           {/* PROFILE */}
           <Card className="md:col-span-3" delay={0}>
             <div className="flex flex-col gap-y-2 h-full p-0">
@@ -893,10 +888,10 @@ export default function Home() {
           </Card>
 
           {/* TECH */}
-          <Card className="md:col-span-2 flex flex-col" delay={120}>
+          <Card className="md:col-span-2 flex flex-col md:h-[360px] [&>div]:flex-1 [&>div]:flex [&>div]:flex-col [&>div]:min-h-0" delay={120}>
             <Prompt cmd="ls -la tech/" />
             <div className="relative flex-1 flex flex-col min-h-0">
-              <div className="grid grid-cols-1 gap-1.5 flex-1 min-h-[220px] max-h-[280px] overflow-y-auto custom-scrollbar pr-1 content-start">
+              <div className="grid grid-cols-1 gap-1.5 flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-1 content-start pb-6">
               {(siteTech ?? TECH).map((t: (typeof TECH)[number]) => (
                 <div key={t.name} className="flex justify-between items-center p-2 bg-zinc-800/50 border border-zinc-700 rounded-none hover:bg-zinc-800 transition-colors group gap-2">
                   <div className="flex items-center gap-2 min-w-0">
@@ -936,9 +931,9 @@ export default function Home() {
             const activeColors = langTab === "os" ? osColors : langTab === "editors" ? editorColors : barColors;
             const title = langTab === "languages" ? "Top Languages" : langTab === "editors" ? "Editors" : "Operating Systems";
             return (
-          <Card className="md:col-span-2" delay={180}>
+          <Card className="md:col-span-2 flex flex-col md:h-[360px] [&>div]:flex-1 [&>div]:flex [&>div]:flex-col [&>div]:min-h-0" delay={180}>
             <Prompt cmd="wakatime --all" />
-            <div className="space-y-3">
+            <div className="space-y-3 flex-1 flex flex-col min-h-0">
               <div className="grid grid-cols-2 gap-2">
                 <div className="bg-zinc-800/50 border border-zinc-700 p-2 min-w-0 overflow-hidden">
                   <div className="text-[10px] text-zinc-400 leading-tight">Coding since {wakaData.codingSince} — age 12</div>
@@ -991,7 +986,7 @@ export default function Home() {
 
             // effect wiring inside IIFE scope via refs — attach inline handlers below
             return (
-          <Card className="md:col-span-2" delay={240}>
+          <Card className="md:col-span-2 flex flex-col md:h-[360px] [&>div]:flex-1 [&>div]:flex [&>div]:flex-col [&>div]:min-h-0" delay={240}>
             <Prompt cmd="mpv --playlist favorites.m3u" />
             <audio
               ref={audioRef}
@@ -1006,8 +1001,8 @@ export default function Home() {
               onPlay={() => setPlaying(true)}
               onPause={() => setPlaying(false)}
             />
-            <div className="space-y-2">
-              <div className="bg-zinc-900 border border-zinc-800 p-2 flex items-center gap-2">
+            <div className="space-y-2 flex-1 flex flex-col min-h-0">
+              <div className="bg-zinc-900 border border-zinc-800 p-2 flex items-center gap-2 shrink-0">
                 <div className="h-10 w-10 bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-400">♪</div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-bold text-zinc-100 truncate">{curTrack.title}</div>
@@ -1057,8 +1052,8 @@ export default function Home() {
                 <span>Playlist</span>
                 <span>{pl.length} tracks{hasUrl ? "" : " · upload audio in /admin/site-content"}</span>
               </div>
-              <div className="relative">
-                <div className="max-h-[220px] overflow-y-auto custom-scrollbar space-y-1 pr-1 pb-6">
+              <div className="relative flex-1 flex flex-col min-h-0">
+                <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar space-y-1 pr-1 pb-6">
                   {pl.map((t, i) => (
                   <button
                     key={`${t.title}-${i}`}
@@ -1218,38 +1213,41 @@ export default function Home() {
             </div>
           </Card>
 
-          {/* YOUTUBE */}
+          {/* YOUTUBE — terminal themed */}
           <Card className="md:col-span-6" delay={460}>
-            <div className="flex items-center justify-center mb-2">
-              <span className="inline-flex items-center gap-2 px-2 py-1 text-[10px] text-zinc-500 border border-zinc-800 rounded-full font-mono">
-                <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" /> Latest Video
-              </span>
-            </div>
-            <h2 className="text-center text-lg font-bold text-zinc-100">YouTube</h2>
-            <p className="text-center text-xs text-zinc-500 mt-1 max-w-md mx-auto">Tutorials, tools, and things I learn — captured on video.</p>
-            <div className="mt-4 rounded-none overflow-hidden border border-zinc-800 bg-black max-w-3xl mx-auto">
-              <div className="relative aspect-video">
-                <iframe
-                  src="https://www.youtube.com/embed/NQJa6Las1Jw"
-                  title="YouTube — ixi_flower"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  className="absolute inset-0 w-full h-full"
-                />
-              </div>
-            </div>
-            <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 max-w-3xl mx-auto px-1">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="h-9 w-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center shrink-0 text-xs font-bold text-zinc-400">i</div>
-                <div className="min-w-0">
-                  <div className="text-xs font-medium text-zinc-200 leading-tight truncate">پیدا کردن هر فایلی زیر ۱ ثانیه! 😳⚡</div>
-                  <div className="text-[11px] text-zinc-500">ixi_flower · YouTube</div>
+            <Prompt cmd="mpv --playlist youtube.m3u --channel ixi_flower" />
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mt-1">
+              <div className="lg:col-span-3">
+                <div className="flex items-center justify-between px-2 py-1 bg-zinc-800 border border-zinc-700 border-b-0 text-[10px] font-mono">
+                  <span className="flex items-center gap-1.5 text-zinc-400"><svg width={12} height={12} viewBox="0 0 24 24" fill="#ef4444" className="shrink-0"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" /></svg> youtube — ixi_flower</span>
+                  <span className="flex gap-1"><span className="h-2 w-2 rounded-full bg-red-500" /><span className="h-2 w-2 rounded-full bg-yellow-500" /><span className="h-2 w-2 rounded-full bg-green-500" /></span>
+                </div>
+                <div className="border border-zinc-800 bg-black overflow-hidden">
+                  <div className="relative aspect-video">
+                    <iframe
+                      src="https://www.youtube.com/embed/NQJa6Las1Jw"
+                      title="YouTube — ixi_flower"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      className="absolute inset-0 w-full h-full"
+                    />
+                  </div>
                 </div>
               </div>
-              <a href="https://youtube.com/@ixi_flower0" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-red-600/10 border border-red-600/30 text-red-400 hover:bg-red-600/20 hover:border-red-600/50 text-xs font-medium shrink-0 self-start sm:self-auto">
-                <svg width={14} height={14} viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" /></svg>
-                Visit channel ↗
-              </a>
+              <div className="lg:col-span-2 flex flex-col justify-between gap-3 py-1">
+                <div>
+                  <div className="text-[10px] text-zinc-500 font-mono flex items-center gap-1.5"><svg width={11} height={11} viewBox="0 0 24 24" fill="#ef4444" className="shrink-0"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" /></svg> now playing</div>
+                  <div className="text-sm font-bold text-zinc-100 mt-1.5 leading-tight">پیدا کردن هر فایلی زیر ۱ ثانیه! 😳⚡</div>
+                  <div className="text-[11px] text-zinc-500 mt-1 font-mono flex items-center gap-1"><svg width={11} height={11} viewBox="0 0 24 24" fill="#ef4444" className="shrink-0"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" /></svg> ixi_flower · YouTube · tools</div>
+                  <p className="text-xs text-zinc-400 mt-3 leading-relaxed">Tutorials, tools, and things I learn — captured on video. New uploads weekly — quick tips, deep dives, and behind-the-scenes.</p>
+                </div>
+                <div className="flex flex-wrap gap-2 justify-end">
+                  <a href="https://youtube.com/@ixi_flower0" target="_blank" rel="noopener noreferrer" className="yt-shine inline-flex items-center gap-2 px-4 py-2 bg-red-600 border border-red-500 text-white hover:bg-red-500 text-xs font-mono transition-all shadow-[0_0_14px_rgba(239,68,68,0.45)] hover:shadow-[0_0_22px_rgba(239,68,68,0.7)] hover:border-red-400">
+                    <svg width={14} height={14} viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" /></svg>
+                    Visit channel ↗
+                  </a>
+                </div>
+              </div>
             </div>
           </Card>
 

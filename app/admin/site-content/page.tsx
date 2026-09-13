@@ -1,8 +1,8 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { Plus, Trash2, ChevronUp, ChevronDown, X, LogOut } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Plus, Trash2, ChevronUp, ChevronDown, LogOut, GripVertical } from 'lucide-react'
 
 type PlaylistTrack = { title: string; artist: string; dur: string; url?: string }
 type WakaData = { total: string; daily: string; codingSince: string; age: string; langs: { name: string; pct: number }[]; editors?: { name: string; pct: number }[]; os?: { name: string; pct: number }[] }
@@ -10,10 +10,13 @@ type TechItem = { name: string; yrs: string; level: 'Advanced' | 'Intermediate' 
 type CourseItem = { title: string; provider: string; year: string; link?: string; status: "completed" | "in-progress" }
 
 type Tab = 'playlist' | 'waka' | 'tech' | 'courses'
+const TAB_KEYS: Tab[] = ['playlist', 'waka', 'tech', 'courses']
 
-export default function AdminSiteContentPage() {
+function SiteContentInner() {
   const router = useRouter()
-  const [tab, setTab] = useState<Tab>('playlist')
+  const searchParams = useSearchParams()
+  const initialTab = (searchParams.get('tab') as Tab) || 'playlist'
+  const [tab, setTab] = useState<Tab>(TAB_KEYS.includes(initialTab) ? initialTab : 'playlist')
   const [playlist, setPlaylist] = useState<PlaylistTrack[]>([])
   const [waka, setWaka] = useState<WakaData>({ total: '', daily: '', codingSince: '', age: '', langs: [] })
   const [tech, setTech] = useState<TechItem[]>([])
@@ -22,6 +25,17 @@ export default function AdminSiteContentPage() {
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState<{ t: 'ok' | 'err'; m: string } | null>(null)
   const [err, setErr] = useState('')
+  const [dragIdx, setDragIdx] = useState<number | null>(null)
+
+  useEffect(() => {
+    const t = searchParams.get('tab') as Tab | null
+    if (t && (TAB_KEYS as string[]).includes(t)) setTab(t)
+  }, [searchParams])
+
+  function switchTab(k: Tab) {
+    setTab(k); setMsg(null)
+    router.replace(`/admin/site-content?tab=${k}`, { scroll: false })
+  }
 
   useEffect(() => {
     fetch('/api/admin/site-content', { cache: 'no-store' })
@@ -31,9 +45,6 @@ export default function AdminSiteContentPage() {
       })
       .then((data) => {
         if (Array.isArray(data.playlist)) setPlaylist(data.playlist as PlaylistTrack[])
-        else if (data.playlist === null || data.playlist === undefined) {
-          // fallback defaults will be loaded via public endpoint on homepage; keep empty so admin sees "use defaults"
-        }
         if (data.waka && typeof data.waka === 'object') setWaka(data.waka as WakaData)
         if (Array.isArray(data.tech)) setTech(data.tech as TechItem[])
         if (Array.isArray(data.courses)) setCourses(data.courses as CourseItem[])
@@ -43,11 +54,8 @@ export default function AdminSiteContentPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  // Fallback: if DB empty, hydrate defaults client-side via public data or hardcoded
   useEffect(() => {
     if (!loading && playlist.length === 0 && tech.length === 0 && !waka.total && courses.length === 0) {
-      // Seed from defaults so admin has something to edit immediately
-      // These match lib/site-content.ts DEFAULT_* — kept inline to avoid server import
       fetch('/api/site-content', { cache: 'no-store' })
         .then((r) => r.json())
         .then((d) => {
@@ -86,7 +94,7 @@ export default function AdminSiteContentPage() {
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-        <p className="text-zinc-600 text-sm text-center py-8 animate-pulse">$ loading site content…</p>
+        <p className="text-zinc-600 text-sm text-center py-8 animate-pulse font-mono">$ loading site content…</p>
       </div>
     )
   }
@@ -96,30 +104,30 @@ export default function AdminSiteContentPage() {
   const sumOs = (waka.os ?? []).reduce((s, l) => s + (Number(l.pct) || 0), 0)
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-      <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 admin-fade">
+      <div className="flex flex-wrap items-start justify-between gap-4 mb-6 admin-fade">
         <div>
           <h1 className="text-xl font-bold text-zinc-100">Site content — admin</h1>
           <p className="text-xs text-zinc-500 mt-1 font-mono">$ site-content --edit — playlist · waka · tech · courses</p>
         </div>
-        <div className="flex gap-2">
+        {/* sidebar already has these on desktop — hide here */}
+        <div className="flex gap-2 md:hidden">
           <Link href="/admin" className="px-3 py-2 border border-zinc-800 text-sm text-zinc-400 hover:text-zinc-100 hover:border-zinc-700">← Admin</Link>
           <Link href="/" className="px-3 py-2 border border-zinc-800 text-sm text-zinc-400 hover:text-zinc-100 hover:border-zinc-700">Site</Link>
           <button onClick={logout} className="inline-flex items-center gap-1.5 px-3 py-2 border border-zinc-800 text-sm text-zinc-500 hover:text-red-400 hover:border-red-500/40 hover:bg-red-950/20 hover:shadow-[0_0_12px_rgba(239,68,68,0.25)] transition-all"><LogOut className="h-3.5 w-3.5" /> Logout</button>
         </div>
       </div>
 
-      {err && <div className="border border-red-900/50 bg-red-950/30 text-red-300 text-sm px-4 py-3 mb-4 font-mono">{err}</div>}
+      {err && <div className="border border-red-900/50 bg-red-950/30 text-red-300 text-sm px-4 py-3 mb-4 font-mono admin-fade">{err}</div>}
       {msg && (
-        <div className={`text-xs px-3 py-2 border font-mono mb-4 ${msg.t === 'ok' ? 'border-emerald-900/50 bg-emerald-950/30 text-emerald-300' : 'border-red-900/50 bg-red-950/30 text-red-300'}`}>{msg.m}</div>
+        <div className={`text-xs px-3 py-2 border font-mono mb-4 admin-fade ${msg.t === 'ok' ? 'border-emerald-900/50 bg-emerald-950/30 text-emerald-300' : 'border-red-900/50 bg-red-950/30 text-red-300'}`}>{msg.m}</div>
       )}
 
-      {/* Tabs */}
-      <div className="inline-flex border border-zinc-700 overflow-hidden mb-6">
-        {(['playlist', 'waka', 'tech', 'courses'] as Tab[]).map((k) => (
+      <div className="inline-flex border border-zinc-700 overflow-hidden mb-6 admin-fade admin-fade-d1">
+        {TAB_KEYS.map((k) => (
           <button
             key={k}
-            onClick={() => { setTab(k); setMsg(null) }}
+            onClick={() => switchTab(k)}
             className={`px-4 py-1.5 text-xs font-mono capitalize transition-colors ${tab === k ? 'bg-zinc-100 text-zinc-900' : 'bg-zinc-900 text-zinc-500 hover:text-zinc-300'}`}
           >
             {k === 'playlist' ? 'Playlist' : k === 'waka' ? 'WakaTime' : k === 'tech' ? 'Tech Stack' : 'Courses'}
@@ -128,7 +136,7 @@ export default function AdminSiteContentPage() {
       </div>
 
       {tab === 'playlist' && (
-        <div className="border border-zinc-800 bg-zinc-900/50 p-4">
+        <div className="border border-zinc-800 bg-zinc-900/50 p-4 admin-fade admin-fade-d2">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-bold text-zinc-100">Playlist — {playlist.length} tracks</h2>
             <button
@@ -140,19 +148,42 @@ export default function AdminSiteContentPage() {
           </div>
           <div className="space-y-2">
             {playlist.map((t, i) => (
-              <PlaylistRow key={i} track={t} idx={i} total={playlist.length} onChange={(patch) => setPlaylist((prev) => prev.map((x, j) => (j === i ? { ...x, ...patch } : x)))} onMoveUp={() => setPlaylist((prev) => { const a = [...prev]; if (i > 0) [a[i - 1], a[i]] = [a[i], a[i - 1]]; return a })} onMoveDown={() => setPlaylist((prev) => { const a = [...prev]; if (i < a.length - 1) [a[i], a[i + 1]] = [a[i + 1], a[i]]; return a })} onRemove={() => setPlaylist((prev) => prev.filter((_, j) => j !== i))} />
+              <div
+                key={i}
+                draggable
+                onDragStart={() => setDragIdx(i)}
+                onDragOver={(e) => {
+                  e.preventDefault()
+                  if (dragIdx === null || dragIdx === i) return
+                  const a = [...playlist]
+                  const [m] = a.splice(dragIdx, 1)
+                  a.splice(i, 0, m)
+                  setPlaylist(a)
+                  setDragIdx(i)
+                }}
+                onDragEnd={() => setDragIdx(null)}
+                onDrop={() => setDragIdx(null)}
+                className={`${dragIdx === i ? 'opacity-40 border-zinc-600' : 'border-zinc-800'} transition-opacity`}
+              >
+                <div className="flex items-center gap-1">
+                  <span title="Drag to reorder" className="shrink-0 h-8 w-6 flex items-center justify-center text-zinc-600 cursor-grab active:cursor-grabbing hover:text-zinc-400"><GripVertical className="h-3.5 w-3.5" /></span>
+                  <div className="flex-1 min-w-0">
+                    <PlaylistRow track={t} idx={i} total={playlist.length} onChange={(patch) => setPlaylist((prev) => prev.map((x, j) => (j === i ? { ...x, ...patch } : x)))} onMoveUp={() => setPlaylist((prev) => { const a = [...prev]; if (i > 0) [a[i - 1], a[i]] = [a[i], a[i - 1]]; return a })} onMoveDown={() => setPlaylist((prev) => { const a = [...prev]; if (i < a.length - 1) [a[i], a[i + 1]] = [a[i + 1], a[i]]; return a })} onRemove={() => setPlaylist((prev) => prev.filter((_, j) => j !== i))} />
+                  </div>
+                </div>
+              </div>
             ))}
             {playlist.length === 0 && <p className="text-zinc-600 text-sm text-center py-6">No tracks — add one.</p>}
           </div>
           <button onClick={() => save('playlist', playlist)} disabled={saving} className="mt-4 px-4 py-2 bg-zinc-100 text-zinc-900 text-sm hover:bg-white disabled:opacity-50">
             {saving ? 'Saving…' : 'Save playlist'}
           </button>
-          <p className="text-[11px] text-zinc-600 mt-2 font-mono">Upload mp3/flac/ogg/m4a → Cloudinary (ixi-wave/tracks). dur m:ss. url saved per track.</p>
+          <p className="text-[11px] text-zinc-600 mt-2 font-mono">Drag the ⋮⋮ handle or use ↑↓ to reorder · upload mp3/flac/ogg/m4a → Cloudinary (ixi-wave/tracks)</p>
         </div>
       )}
 
       {tab === 'waka' && (
-        <div className="border border-zinc-800 bg-zinc-900/50 p-4 space-y-4">
+        <div className="border border-zinc-800 bg-zinc-900/50 p-4 space-y-4 admin-fade admin-fade-d2">
           <h2 className="text-sm font-bold text-zinc-100">WakaTime card</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <label className="block">
@@ -178,7 +209,6 @@ export default function AdminSiteContentPage() {
               <span className="text-[11px] text-zinc-500 font-mono">Top Languages — langs[]</span>
               <span className={`text-[11px] font-mono ${sumPct === 100 ? 'text-emerald-400' : 'text-amber-400'}`}>sum {sumPct}% {sumPct !== 100 && '≠ 100'}</span>
             </div>
-            {/* Bar preview */}
             <div className="h-2 w-full bg-zinc-800 flex overflow-hidden mt-2">
               {waka.langs.map((l, i) => (
                 <div key={i} className={['bg-sky-500', 'bg-yellow-500', 'bg-violet-500', 'bg-emerald-500', 'bg-orange-500'][i % 5]} style={{ width: `${l.pct}%` }} />
@@ -187,20 +217,8 @@ export default function AdminSiteContentPage() {
             <div className="mt-3 space-y-2">
               {waka.langs.map((l, i) => (
                 <div key={i} className="flex gap-2 items-center p-2 border border-zinc-800 bg-zinc-900">
-                  <input
-                    value={l.name}
-                    onChange={(e) => setWaka((v) => ({ ...v, langs: v.langs.map((x, idx) => (idx === i ? { ...x, name: e.target.value } : x)) }))}
-                    placeholder="Language"
-                    className="flex-1 bg-zinc-950 border border-zinc-800 px-2 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-zinc-600"
-                  />
-                  <input
-                    type="number"
-                    min={0}
-                    max={100}
-                    value={l.pct}
-                    onChange={(e) => setWaka((v) => ({ ...v, langs: v.langs.map((x, idx) => (idx === i ? { ...x, pct: Math.min(100, Math.max(0, Number(e.target.value) || 0)) } : x)) }))}
-                    className="w-20 bg-zinc-950 border border-zinc-800 px-2 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-zinc-600 font-mono"
-                  />
+                  <input value={l.name} onChange={(e) => setWaka((v) => ({ ...v, langs: v.langs.map((x, idx) => (idx === i ? { ...x, name: e.target.value } : x)) }))} placeholder="Language" className="flex-1 bg-zinc-950 border border-zinc-800 px-2 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-zinc-600" />
+                  <input type="number" min={0} max={100} value={l.pct} onChange={(e) => setWaka((v) => ({ ...v, langs: v.langs.map((x, idx) => (idx === i ? { ...x, pct: Math.min(100, Math.max(0, Number(e.target.value) || 0)) } : x)) }))} className="w-20 bg-zinc-950 border border-zinc-800 px-2 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-zinc-600 font-mono" />
                   <span className="text-[11px] text-zinc-500">%</span>
                   <button onClick={() => setWaka((v) => ({ ...v, langs: v.langs.filter((_, idx) => idx !== i) }))} className="h-7 w-7 flex items-center justify-center border border-red-900/50 text-red-400 hover:bg-red-950/30"><Trash2 className="h-3 w-3" /></button>
                 </div>
@@ -262,15 +280,10 @@ export default function AdminSiteContentPage() {
       )}
 
       {tab === 'tech' && (
-        <div className="border border-zinc-800 bg-zinc-900/50 p-4">
+        <div className="border border-zinc-800 bg-zinc-900/50 p-4 admin-fade admin-fade-d2">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-bold text-zinc-100">Tech stack — {tech.length} items</h2>
-            <button
-              onClick={() => setTech((t) => [...t, { name: '', yrs: '1+ yrs', level: 'Intermediate', color: '#888888', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg' }])}
-              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
-            >
-              <Plus className="h-3 w-3" /> Add
-            </button>
+            <button onClick={() => setTech((t) => [...t, { name: '', yrs: '1+ yrs', level: 'Intermediate', color: '#888888', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg' }])} className="inline-flex items-center gap-1 px-3 py-1.5 text-xs border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"><Plus className="h-3 w-3" /> Add</button>
           </div>
           <div className="space-y-2">
             {tech.map((item, i) => (
@@ -282,20 +295,8 @@ export default function AdminSiteContentPage() {
                   <span className="text-[10px] text-zinc-500 whitespace-nowrap">{item.yrs}</span>
                   <span className="text-[10px] px-1.5 py-0.5 bg-zinc-800 border border-zinc-700 text-zinc-300">{item.level}</span>
                   <div className="ml-auto flex gap-1">
-                    <button
-                      onClick={() => setTech((prev) => { const a = [...prev]; if (i > 0) [a[i - 1], a[i]] = [a[i], a[i - 1]]; return a })}
-                      disabled={i === 0}
-                      className="h-7 w-7 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"
-                    >
-                      <ChevronUp className="h-3 w-3" />
-                    </button>
-                    <button
-                      onClick={() => setTech((prev) => { const a = [...prev]; if (i < a.length - 1) [a[i], a[i + 1]] = [a[i + 1], a[i]]; return a })}
-                      disabled={i === tech.length - 1}
-                      className="h-7 w-7 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"
-                    >
-                      <ChevronDown className="h-3 w-3" />
-                    </button>
+                    <button onClick={() => setTech((prev) => { const a = [...prev]; if (i > 0) [a[i - 1], a[i]] = [a[i], a[i - 1]]; return a })} disabled={i === 0} className="h-7 w-7 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"><ChevronUp className="h-3 w-3" /></button>
+                    <button onClick={() => setTech((prev) => { const a = [...prev]; if (i < a.length - 1) [a[i], a[i + 1]] = [a[i + 1], a[i]]; return a })} disabled={i === tech.length - 1} className="h-7 w-7 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"><ChevronDown className="h-3 w-3" /></button>
                     <button onClick={() => setTech((prev) => prev.filter((_, idx) => idx !== i))} className="h-7 w-7 flex items-center justify-center border border-red-900/50 text-red-400 hover:bg-red-950/30"><Trash2 className="h-3 w-3" /></button>
                   </div>
                 </div>
@@ -325,15 +326,10 @@ export default function AdminSiteContentPage() {
       )}
 
       {tab === 'courses' && (
-        <div className="border border-zinc-800 bg-zinc-900/50 p-4">
+        <div className="border border-zinc-800 bg-zinc-900/50 p-4 admin-fade admin-fade-d2">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-bold text-zinc-100">Courses — {courses.length} items</h2>
-            <button
-              onClick={() => setCourses((c) => [...c, { title: '', provider: '', year: '2024', link: '', status: 'completed' }])}
-              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
-            >
-              <Plus className="h-3 w-3" /> Add course
-            </button>
+            <button onClick={() => setCourses((c) => [...c, { title: '', provider: '', year: '2024', link: '', status: 'completed' }])} className="inline-flex items-center gap-1 px-3 py-1.5 text-xs border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"><Plus className="h-3 w-3" /> Add course</button>
           </div>
           <div className="space-y-2">
             {courses.map((course, i) => (
@@ -343,20 +339,8 @@ export default function AdminSiteContentPage() {
                   <span className="text-xs font-medium text-zinc-200 truncate flex-1">{course.title || '(untitled)'}</span>
                   <span className={`text-[10px] px-1.5 py-0.5 border whitespace-nowrap ${course.status === 'completed' ? 'bg-emerald-950/40 border-emerald-800 text-emerald-300' : 'bg-amber-950/40 border-amber-800 text-amber-300'}`}>{course.status}</span>
                   <div className="flex gap-1 shrink-0">
-                    <button
-                      onClick={() => setCourses((prev) => { const a = [...prev]; if (i > 0) [a[i - 1], a[i]] = [a[i], a[i - 1]]; return a })}
-                      disabled={i === 0}
-                      className="h-7 w-7 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"
-                    >
-                      <ChevronUp className="h-3 w-3" />
-                    </button>
-                    <button
-                      onClick={() => setCourses((prev) => { const a = [...prev]; if (i < a.length - 1) [a[i], a[i + 1]] = [a[i + 1], a[i]]; return a })}
-                      disabled={i === courses.length - 1}
-                      className="h-7 w-7 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"
-                    >
-                      <ChevronDown className="h-3 w-3" />
-                    </button>
+                    <button onClick={() => setCourses((prev) => { const a = [...prev]; if (i > 0) [a[i - 1], a[i]] = [a[i], a[i - 1]]; return a })} disabled={i === 0} className="h-7 w-7 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"><ChevronUp className="h-3 w-3" /></button>
+                    <button onClick={() => setCourses((prev) => { const a = [...prev]; if (i < a.length - 1) [a[i], a[i + 1]] = [a[i + 1], a[i]]; return a })} disabled={i === courses.length - 1} className="h-7 w-7 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"><ChevronDown className="h-3 w-3" /></button>
                     <button onClick={() => setCourses((prev) => prev.filter((_, idx) => idx !== i))} className="h-7 w-7 flex items-center justify-center border border-red-900/50 text-red-400 hover:bg-red-950/30"><Trash2 className="h-3 w-3" /></button>
                   </div>
                 </div>
@@ -384,6 +368,14 @@ export default function AdminSiteContentPage() {
   )
 }
 
+export default function AdminSiteContentPage() {
+  return (
+    <Suspense fallback={<div className="max-w-5xl mx-auto px-4 sm:px-6 py-8"><p className="text-zinc-600 text-sm text-center py-8 animate-pulse font-mono">$ loading site content…</p></div>}>
+      <SiteContentInner />
+    </Suspense>
+  )
+}
+
 function PlaylistRow({ track, idx, total, onChange, onMoveUp, onMoveDown, onRemove }: { track: PlaylistTrack; idx: number; total: number; onChange: (p: Partial<PlaylistTrack>) => void; onMoveUp: () => void; onMoveDown: () => void; onRemove: () => void }) {
   const [uploading, setUploading] = useState(false)
   const [upErr, setUpErr] = useState('')
@@ -399,7 +391,6 @@ function PlaylistRow({ track, idx, total, onChange, onMoveUp, onMoveDown, onRemo
       const j = await r.json().catch(() => ({}))
       if (!r.ok) { setUpErr(j.error || 'Upload failed'); return }
       onChange({ url: j.url as string })
-      // auto-fill title from filename if empty
       if (!track.title) {
         const base = f.name.replace(/\.[^.]+$/, '')
         onChange({ title: base })
