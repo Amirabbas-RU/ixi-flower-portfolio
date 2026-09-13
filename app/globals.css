@@ -28,6 +28,17 @@ body {
 
 @keyframes pulse-blink { 0%,100%{opacity:1} 50%{opacity:0} }
 
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-up { animation: fadeUp 0.45s ease both; }
+.delay-1 { animation-delay: 60ms; }
+.delay-2 { animation-delay: 120ms; }
+.delay-3 { animation-delay: 180ms; }
+.delay-4 { animation-delay: 240ms; }
+.delay-5 { animation-delay: 300ms; }
+.delay-6 { animation-delay: 360ms; }
+.delay-7 { animation-delay: 420ms; }
+.delay-8 { animation-delay: 480ms; }
+
 /* — Tiptap editor surface (zinc terminal chrome) — */
 .tiptap-editor .ProseMirror {
   min-height: 280px;
@@ -111,3 +122,23 @@ body {
 .blog-content table { width: 100%; border-collapse: collapse; margin: 0 0 1.25rem; font-size: 0.9rem; }
 .blog-content th, .blog-content td { border: 1px solid #3f3f46; padding: 0.45rem 0.65rem; text-align: left; }
 .blog-content th { background: #27272a; font-weight: 700; color: #fafafa; }
+
+/* — Code blocks must always be LTR even inside RTL (FA) contexts — */
+.blog-content pre,
+.blog-content pre code,
+.blog-content code {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: plaintext;
+}
+.blog-content pre { white-space: pre; }
+
+/* — Persian (Vazirmatn) smoothing — very smooth rendering — */
+[class*="font-[var(--font-vazirmatn)]"],
+.font-\[var\(--font-vazirmatn\)\] {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01" 1;
+  letter-spacing: -0.01em;
+}

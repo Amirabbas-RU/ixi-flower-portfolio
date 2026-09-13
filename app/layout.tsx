@@ -8,7 +8,7 @@ const vazirmatn = Vazirmatn({
   subsets: ["arabic", "latin"],
   variable: "--font-vazirmatn",
   display: "swap",
-  weight: ["300", "400", "500", "700"],
+  weight: ["200", "300", "400", "500", "700"],
 });
 
 export const metadata: Metadata = {

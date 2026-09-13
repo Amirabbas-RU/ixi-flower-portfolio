@@ -83,6 +83,23 @@ export const siteSettings = pgTable("site_settings", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const postReactions = pgTable(
+  "post_reactions",
+  {
+    id: serial("id").primaryKey(),
+    postId: text("post_id")
+      .notNull()
+      .references(() => posts.id, { onDelete: "cascade" }),
+    fingerprint: varchar("fingerprint", { length: 120 }).notNull(),
+    kind: varchar("kind", { length: 10 }).notNull(), // like | dislike
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [
+    index("post_reactions_post_idx").on(t.postId),
+    uniqueIndex("post_reactions_uniq").on(t.postId, t.fingerprint),
+  ]
+);
+
 export type PostRow = typeof posts.$inferSelect;
 export type TagRow = typeof tags.$inferSelect;
 export type AdminUserRow = typeof adminUsers.$inferSelect;

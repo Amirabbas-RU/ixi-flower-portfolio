@@ -17,20 +17,9 @@ function getHeaders(): Record<string, string> {
 export default function AdminBlogList() {
   const [posts, setPosts] = useState<Post[]>([])
   const [q, setQ] = useState('')
-  const [secret, setSecret] = useState('')
   const [busyId, setBusyId] = useState<string | null>(null)
   const [fetching, setFetching] = useState(false)
   const [err, setErr] = useState('')
-
-  useEffect(() => {
-    setSecret(localStorage.getItem('ixi_admin_secret') || '')
-  }, [])
-
-  const saveSecret = () => {
-    localStorage.setItem('ixi_admin_secret', secret.trim())
-    setErr('')
-    load(q)
-  }
 
   const load = useCallback(async (query: string) => {
     setFetching(true); setErr('')
@@ -81,13 +70,6 @@ export default function AdminBlogList() {
           <Link href="/admin/blog/new" className="px-4 py-2 bg-zinc-100 text-zinc-900 text-sm hover:bg-white">+ New post</Link>
           <Link href="/" className="px-4 py-2 border border-zinc-800 text-sm text-zinc-400 hover:text-zinc-100">← Site</Link>
         </div>
-      </div>
-
-      {/* secret input */}
-      <div className="mb-4 flex gap-2 items-center border border-zinc-800 bg-zinc-900 p-2">
-        <span className="text-[11px] text-zinc-500 shrink-0">ADMIN_SECRET</span>
-        <input value={secret} onChange={e => setSecret(e.target.value)} placeholder="ixi-dev-secret-2026" className="flex-1 bg-zinc-950 border border-zinc-800 px-2 py-1 text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600" />
-        <button onClick={saveSecret} className="px-3 py-1 text-xs border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700">Save</button>
       </div>
 
       <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search posts…" className="w-full max-w-md bg-zinc-900 border border-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 mb-4" />
