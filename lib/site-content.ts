@@ -187,9 +187,9 @@ export const DEFAULT_WAKA = {
     { name: "Cursor", pct: 8 },
   ],
   os: [
-    { name: "Linux", pct: 68 },
+    { name: "Linux", pct: 76 },
     { name: "Windows", pct: 24 },
-    { name: "macOS", pct: 8 },
+    { name: "macOS", pct: 0 },
   ],
 } as const;
 

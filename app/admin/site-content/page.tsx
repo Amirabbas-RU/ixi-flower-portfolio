@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { Plus, Trash2, ChevronUp, ChevronDown, X, LogOut } from 'lucide-react'
 
 type PlaylistTrack = { title: string; artist: string; dur: string; url?: string }
 type WakaData = { total: string; daily: string; codingSince: string; age: string; langs: { name: string; pct: number }[]; editors?: { name: string; pct: number }[]; os?: { name: string; pct: number }[] }
@@ -104,7 +105,7 @@ export default function AdminSiteContentPage() {
         <div className="flex gap-2">
           <Link href="/admin" className="px-3 py-2 border border-zinc-800 text-sm text-zinc-400 hover:text-zinc-100 hover:border-zinc-700">← Admin</Link>
           <Link href="/" className="px-3 py-2 border border-zinc-800 text-sm text-zinc-400 hover:text-zinc-100 hover:border-zinc-700">Site</Link>
-          <button onClick={logout} className="px-3 py-2 border border-zinc-800 text-sm text-zinc-500 hover:text-zinc-100 hover:border-zinc-700">Logout</button>
+          <button onClick={logout} className="inline-flex items-center gap-1.5 px-3 py-2 border border-zinc-800 text-sm text-zinc-500 hover:text-red-400 hover:border-red-500/40 hover:bg-red-950/20 hover:shadow-[0_0_12px_rgba(239,68,68,0.25)] transition-all"><LogOut className="h-3.5 w-3.5" /> Logout</button>
         </div>
       </div>
 
@@ -134,7 +135,7 @@ export default function AdminSiteContentPage() {
               onClick={() => setPlaylist((p) => [...p, { title: '', artist: 'Bahram', dur: '3:00', url: '' }])}
               className="px-3 py-1.5 text-xs border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
             >
-              + Add track
+              <span className="inline-flex items-center gap-1"><Plus className="h-3 w-3" /> Add track</span>
             </button>
           </div>
           <div className="space-y-2">
@@ -201,11 +202,11 @@ export default function AdminSiteContentPage() {
                     className="w-20 bg-zinc-950 border border-zinc-800 px-2 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-zinc-600 font-mono"
                   />
                   <span className="text-[11px] text-zinc-500">%</span>
-                  <button onClick={() => setWaka((v) => ({ ...v, langs: v.langs.filter((_, idx) => idx !== i) }))} className="px-2 py-1 text-[11px] border border-red-900/50 text-red-400 hover:bg-red-950/30">✕</button>
+                  <button onClick={() => setWaka((v) => ({ ...v, langs: v.langs.filter((_, idx) => idx !== i) }))} className="h-7 w-7 flex items-center justify-center border border-red-900/50 text-red-400 hover:bg-red-950/30"><Trash2 className="h-3 w-3" /></button>
                 </div>
               ))}
             </div>
-            <button onClick={() => setWaka((v) => ({ ...v, langs: [...v.langs, { name: '', pct: 10 }] }))} className="mt-2 px-3 py-1.5 text-xs border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700">+ Add language</button>
+            <button onClick={() => setWaka((v) => ({ ...v, langs: [...v.langs, { name: '', pct: 10 }] }))} className="mt-2 inline-flex items-center gap-1 px-3 py-1.5 text-xs border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"><Plus className="h-3 w-3" /> Add language</button>
           </div>
 
           <div>
@@ -224,11 +225,11 @@ export default function AdminSiteContentPage() {
                   <input value={l.name} onChange={(e) => setWaka((v) => ({ ...v, editors: (v.editors ?? []).map((x, idx) => (idx === i ? { ...x, name: e.target.value } : x)) }))} placeholder="Editor (VS Code, Neovim, Claude Code…)" className="flex-1 bg-zinc-950 border border-zinc-800 px-2 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-zinc-600" />
                   <input type="number" min={0} max={100} value={l.pct} onChange={(e) => setWaka((v) => ({ ...v, editors: (v.editors ?? []).map((x, idx) => (idx === i ? { ...x, pct: Math.min(100, Math.max(0, Number(e.target.value) || 0)) } : x)) }))} className="w-20 bg-zinc-950 border border-zinc-800 px-2 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-zinc-600 font-mono" />
                   <span className="text-[11px] text-zinc-500">%</span>
-                  <button onClick={() => setWaka((v) => ({ ...v, editors: (v.editors ?? []).filter((_, idx) => idx !== i) }))} className="px-2 py-1 text-[11px] border border-red-900/50 text-red-400 hover:bg-red-950/30">✕</button>
+                  <button onClick={() => setWaka((v) => ({ ...v, editors: (v.editors ?? []).filter((_, idx) => idx !== i) }))} className="h-7 w-7 flex items-center justify-center border border-red-900/50 text-red-400 hover:bg-red-950/30"><Trash2 className="h-3 w-3" /></button>
                 </div>
               ))}
             </div>
-            <button onClick={() => setWaka((v) => ({ ...v, editors: [...(v.editors ?? []), { name: '', pct: 10 }] }))} className="mt-2 px-3 py-1.5 text-xs border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700">+ Add editor</button>
+            <button onClick={() => setWaka((v) => ({ ...v, editors: [...(v.editors ?? []), { name: '', pct: 10 }] }))} className="mt-2 inline-flex items-center gap-1 px-3 py-1.5 text-xs border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"><Plus className="h-3 w-3" /> Add editor</button>
           </div>
 
           <div>
@@ -247,11 +248,11 @@ export default function AdminSiteContentPage() {
                   <input value={l.name} onChange={(e) => setWaka((v) => ({ ...v, os: (v.os ?? []).map((x, idx) => (idx === i ? { ...x, name: e.target.value } : x)) }))} placeholder="OS (Linux, Windows, macOS…)" className="flex-1 bg-zinc-950 border border-zinc-800 px-2 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-zinc-600" />
                   <input type="number" min={0} max={100} value={l.pct} onChange={(e) => setWaka((v) => ({ ...v, os: (v.os ?? []).map((x, idx) => (idx === i ? { ...x, pct: Math.min(100, Math.max(0, Number(e.target.value) || 0)) } : x)) }))} className="w-20 bg-zinc-950 border border-zinc-800 px-2 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-zinc-600 font-mono" />
                   <span className="text-[11px] text-zinc-500">%</span>
-                  <button onClick={() => setWaka((v) => ({ ...v, os: (v.os ?? []).filter((_, idx) => idx !== i) }))} className="px-2 py-1 text-[11px] border border-red-900/50 text-red-400 hover:bg-red-950/30">✕</button>
+                  <button onClick={() => setWaka((v) => ({ ...v, os: (v.os ?? []).filter((_, idx) => idx !== i) }))} className="h-7 w-7 flex items-center justify-center border border-red-900/50 text-red-400 hover:bg-red-950/30"><Trash2 className="h-3 w-3" /></button>
                 </div>
               ))}
             </div>
-            <button onClick={() => setWaka((v) => ({ ...v, os: [...(v.os ?? []), { name: '', pct: 10 }] }))} className="mt-2 px-3 py-1.5 text-xs border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700">+ Add OS</button>
+            <button onClick={() => setWaka((v) => ({ ...v, os: [...(v.os ?? []), { name: '', pct: 10 }] }))} className="mt-2 inline-flex items-center gap-1 px-3 py-1.5 text-xs border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"><Plus className="h-3 w-3" /> Add OS</button>
           </div>
 
           <button onClick={() => save('waka', waka)} disabled={saving} className="px-4 py-2 bg-zinc-100 text-zinc-900 text-sm hover:bg-white disabled:opacity-50">
@@ -266,9 +267,9 @@ export default function AdminSiteContentPage() {
             <h2 className="text-sm font-bold text-zinc-100">Tech stack — {tech.length} items</h2>
             <button
               onClick={() => setTech((t) => [...t, { name: '', yrs: '1+ yrs', level: 'Intermediate', color: '#888888', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg' }])}
-              className="px-3 py-1.5 text-xs border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
             >
-              + Add
+              <Plus className="h-3 w-3" /> Add
             </button>
           </div>
           <div className="space-y-2">
@@ -284,18 +285,18 @@ export default function AdminSiteContentPage() {
                     <button
                       onClick={() => setTech((prev) => { const a = [...prev]; if (i > 0) [a[i - 1], a[i]] = [a[i], a[i - 1]]; return a })}
                       disabled={i === 0}
-                      className="px-2 py-1 text-[11px] border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"
+                      className="h-7 w-7 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"
                     >
-                      ↑
+                      <ChevronUp className="h-3 w-3" />
                     </button>
                     <button
                       onClick={() => setTech((prev) => { const a = [...prev]; if (i < a.length - 1) [a[i], a[i + 1]] = [a[i + 1], a[i]]; return a })}
                       disabled={i === tech.length - 1}
-                      className="px-2 py-1 text-[11px] border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"
+                      className="h-7 w-7 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"
                     >
-                      ↓
+                      <ChevronDown className="h-3 w-3" />
                     </button>
-                    <button onClick={() => setTech((prev) => prev.filter((_, idx) => idx !== i))} className="px-2 py-1 text-[11px] border border-red-900/50 text-red-400 hover:bg-red-950/30">✕</button>
+                    <button onClick={() => setTech((prev) => prev.filter((_, idx) => idx !== i))} className="h-7 w-7 flex items-center justify-center border border-red-900/50 text-red-400 hover:bg-red-950/30"><Trash2 className="h-3 w-3" /></button>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -329,9 +330,9 @@ export default function AdminSiteContentPage() {
             <h2 className="text-sm font-bold text-zinc-100">Courses — {courses.length} items</h2>
             <button
               onClick={() => setCourses((c) => [...c, { title: '', provider: '', year: '2024', link: '', status: 'completed' }])}
-              className="px-3 py-1.5 text-xs border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
             >
-              + Add course
+              <Plus className="h-3 w-3" /> Add course
             </button>
           </div>
           <div className="space-y-2">
@@ -345,18 +346,18 @@ export default function AdminSiteContentPage() {
                     <button
                       onClick={() => setCourses((prev) => { const a = [...prev]; if (i > 0) [a[i - 1], a[i]] = [a[i], a[i - 1]]; return a })}
                       disabled={i === 0}
-                      className="px-2 py-1 text-[11px] border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"
+                      className="h-7 w-7 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"
                     >
-                      ↑
+                      <ChevronUp className="h-3 w-3" />
                     </button>
                     <button
                       onClick={() => setCourses((prev) => { const a = [...prev]; if (i < a.length - 1) [a[i], a[i + 1]] = [a[i + 1], a[i]]; return a })}
                       disabled={i === courses.length - 1}
-                      className="px-2 py-1 text-[11px] border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"
+                      className="h-7 w-7 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"
                     >
-                      ↓
+                      <ChevronDown className="h-3 w-3" />
                     </button>
-                    <button onClick={() => setCourses((prev) => prev.filter((_, idx) => idx !== i))} className="px-2 py-1 text-[11px] border border-red-900/50 text-red-400 hover:bg-red-950/30">✕</button>
+                    <button onClick={() => setCourses((prev) => prev.filter((_, idx) => idx !== i))} className="h-7 w-7 flex items-center justify-center border border-red-900/50 text-red-400 hover:bg-red-950/30"><Trash2 className="h-3 w-3" /></button>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -419,9 +420,9 @@ function PlaylistRow({ track, idx, total, onChange, onMoveUp, onMoveDown, onRemo
         <input value={track.artist} onChange={(e) => onChange({ artist: e.target.value })} placeholder="Artist" className="w-28 bg-zinc-950 border border-zinc-800 px-2 py-1.5 text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600" />
         <input value={track.dur} onChange={(e) => onChange({ dur: e.target.value })} placeholder="3:16" className="w-16 bg-zinc-950 border border-zinc-800 px-2 py-1.5 text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 font-mono" />
         <div className="flex gap-1 shrink-0">
-          <button onClick={onMoveUp} disabled={idx === 0} className="px-2 py-1 text-[11px] border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30">↑</button>
-          <button onClick={onMoveDown} disabled={idx === total - 1} className="px-2 py-1 text-[11px] border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30">↓</button>
-          <button onClick={onRemove} className="px-2 py-1 text-[11px] border border-red-900/50 text-red-400 hover:bg-red-950/30">✕</button>
+          <button onClick={onMoveUp} disabled={idx === 0} className="h-7 w-7 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"><ChevronUp className="h-3 w-3" /></button>
+          <button onClick={onMoveDown} disabled={idx === total - 1} className="h-7 w-7 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"><ChevronDown className="h-3 w-3" /></button>
+          <button onClick={onRemove} className="h-7 w-7 flex items-center justify-center border border-red-900/50 text-red-400 hover:bg-red-950/30"><Trash2 className="h-3 w-3" /></button>
         </div>
       </div>
       <div className="flex flex-wrap gap-2 items-center">

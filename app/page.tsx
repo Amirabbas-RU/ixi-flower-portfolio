@@ -52,9 +52,9 @@ const WAKA = {
     { name: "Cursor", pct: 8 },
   ],
   os: [
-    { name: "Linux", pct: 68 },
+    { name: "Linux", pct: 76 },
     { name: "Windows", pct: 24 },
-    { name: "macOS", pct: 8 },
+    { name: "macOS", pct: 0 },
   ],
 };
 
@@ -893,10 +893,10 @@ export default function Home() {
           </Card>
 
           {/* TECH */}
-          <Card className="md:col-span-2" delay={120}>
+          <Card className="md:col-span-2 flex flex-col" delay={120}>
             <Prompt cmd="ls -la tech/" />
-            <div className="relative">
-              <div className="grid grid-cols-1 gap-1.5 max-h-[220px] overflow-y-auto custom-scrollbar pr-1 pb-6">
+            <div className="relative flex-1 flex flex-col min-h-0">
+              <div className="grid grid-cols-1 gap-1.5 flex-1 min-h-[220px] max-h-[280px] overflow-y-auto custom-scrollbar pr-1 content-start">
               {(siteTech ?? TECH).map((t: (typeof TECH)[number]) => (
                 <div key={t.name} className="flex justify-between items-center p-2 bg-zinc-800/50 border border-zinc-700 rounded-none hover:bg-zinc-800 transition-colors group gap-2">
                   <div className="flex items-center gap-2 min-w-0">
@@ -1158,9 +1158,9 @@ export default function Home() {
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-zinc-900/80 via-zinc-900/40 to-transparent" aria-hidden />
                 </div>
                 <div className="text-center mt-2">
-                  <button onClick={() => setShowAllBlogs(true)} className="text-xs text-zinc-300 hover:text-zinc-100 inline-flex items-center gap-1">
+                  <a href="/blogs" className="text-xs text-zinc-300 hover:text-zinc-100 inline-flex items-center gap-1">
                     View all posts ({source.length}) <span>→</span>
-                  </button>
+                  </a>
                 </div>
               </Card>
             );
@@ -1218,8 +1218,43 @@ export default function Home() {
             </div>
           </Card>
 
+          {/* YOUTUBE */}
+          <Card className="md:col-span-6" delay={460}>
+            <div className="flex items-center justify-center mb-2">
+              <span className="inline-flex items-center gap-2 px-2 py-1 text-[10px] text-zinc-500 border border-zinc-800 rounded-full font-mono">
+                <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" /> Latest Video
+              </span>
+            </div>
+            <h2 className="text-center text-lg font-bold text-zinc-100">YouTube</h2>
+            <p className="text-center text-xs text-zinc-500 mt-1 max-w-md mx-auto">Tutorials, tools, and things I learn — captured on video.</p>
+            <div className="mt-4 rounded-none overflow-hidden border border-zinc-800 bg-black max-w-3xl mx-auto">
+              <div className="relative aspect-video">
+                <iframe
+                  src="https://www.youtube.com/embed/NQJa6Las1Jw"
+                  title="YouTube — ixi_flower"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full"
+                />
+              </div>
+            </div>
+            <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 max-w-3xl mx-auto px-1">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="h-9 w-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center shrink-0 text-xs font-bold text-zinc-400">i</div>
+                <div className="min-w-0">
+                  <div className="text-xs font-medium text-zinc-200 leading-tight truncate">پیدا کردن هر فایلی زیر ۱ ثانیه! 😳⚡</div>
+                  <div className="text-[11px] text-zinc-500">ixi_flower · YouTube</div>
+                </div>
+              </div>
+              <a href="https://youtube.com/@ixi_flower0" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-red-600/10 border border-red-600/30 text-red-400 hover:bg-red-600/20 hover:border-red-600/50 text-xs font-medium shrink-0 self-start sm:self-auto">
+                <svg width={14} height={14} viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" /></svg>
+                Visit channel ↗
+              </a>
+            </div>
+          </Card>
+
           {/* FOOTER CONNECT */}
-          <Card className="md:col-span-6" delay={480}>
+          <Card className="md:col-span-6" delay={500}>
             <div className="text-center">
               <pre className="inline-block text-xs text-zinc-500 leading-tight">+-----------------------+{"\n"}|     CONNECT WITH ME    |{"\n"}+-----------------------+</pre>
             </div>

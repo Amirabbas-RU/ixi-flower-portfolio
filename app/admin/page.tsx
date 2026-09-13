@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { Plus, Trash2, LogOut, X } from 'lucide-react'
 
 type Social = { label: string; href: string; icon: 'github' | 'twitter' | 'linkedin' | 'mail'; command: string }
 type Profile = { handle: string; title: string; name: string; bio: string; avatar?: string; avatarPublicId?: string; socials: Social[] }
@@ -40,6 +41,7 @@ export default function AdminIndex() {
   const [savingProfile, setSavingProfile] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [profileMsg, setProfileMsg] = useState<{ t: 'ok' | 'err'; m: string } | null>(null)
+  const [avatarOpen, setAvatarOpen] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -189,7 +191,7 @@ export default function AdminIndex() {
           <h1 className="text-xl font-bold text-zinc-100">Admin</h1>
           <p className="text-sm text-zinc-500 mt-1">ixi_flower — owner only{email ? ` · ${email}` : ''}</p>
         </div>
-        <button onClick={logout} className="px-3 py-1.5 text-xs border border-zinc-800 text-zinc-500 hover:text-zinc-100 hover:border-zinc-700">Logout</button>
+        <button onClick={logout} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-zinc-800 text-zinc-500 hover:text-red-400 hover:border-red-500/40 hover:bg-red-950/20 hover:shadow-[0_0_12px_rgba(239,68,68,0.25)] transition-all"><LogOut className="h-3.5 w-3.5" /> Logout</button>
       </div>
 
       <div className="mt-6 flex flex-wrap gap-3">
@@ -213,10 +215,10 @@ export default function AdminIndex() {
             <form onSubmit={handleSaveProfile} className="mt-4 space-y-4">
               {/* avatar */}
               <div className="flex gap-4 items-start">
-                <div className="w-20 h-20 overflow-hidden bg-zinc-950 border border-zinc-800 shrink-0 flex items-center justify-center">
+                <button type="button" onClick={() => setAvatarOpen(true)} className="w-20 h-20 overflow-hidden bg-zinc-950 border border-zinc-800 shrink-0 flex items-center justify-center hover:border-zinc-600 transition-colors" title="Click to enlarge">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={profile.avatar || '/avatar.jpg'} alt="avatar preview" className="object-cover w-full h-full" onError={(e) => { (e.target as HTMLImageElement).src = '/avatar.jpg' }} />
-                </div>
+                </button>
                 <div className="flex-1 min-w-0 space-y-2">
                   <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/gif,image/webp,image/avif" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleAvatarUpload(f); e.target.value = '' }} />
                   <button type="button" disabled={uploading} onClick={() => fileRef.current?.click()} className="px-3 py-1.5 text-xs border border-zinc-700 bg-zinc-800 text-zinc-100 hover:bg-zinc-700 disabled:opacity-50">{uploading ? 'Uploading…' : 'Upload avatar'}</button>
@@ -252,7 +254,7 @@ export default function AdminIndex() {
               <div className="border-t border-zinc-800 pt-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-bold text-zinc-100">Socials ({profile.socials.length}/8)</h3>
-                  <button type="button" onClick={addSocial} disabled={profile.socials.length >= 8} className="px-2 py-1 text-xs border border-zinc-700 text-zinc-300 hover:bg-zinc-800 disabled:opacity-40">+ Add</button>
+                  <button type="button" onClick={addSocial} disabled={profile.socials.length >= 8} className="inline-flex items-center gap-1 px-2 py-1 text-xs border border-zinc-700 text-zinc-300 hover:bg-zinc-800 disabled:opacity-40"><Plus className="h-3 w-3" /> Add</button>
                 </div>
                 <div className="mt-3 space-y-3">
                   {profile.socials.length === 0 && <p className="text-xs text-zinc-500">No socials — add one.</p>}
@@ -260,7 +262,7 @@ export default function AdminIndex() {
                     <div key={idx} className="border border-zinc-800 bg-zinc-950 p-3 space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-[11px] text-zinc-500 font-mono">#{idx + 1}</span>
-                        <button type="button" onClick={() => removeSocial(idx)} className="text-[11px] text-red-400 hover:text-red-300">Remove</button>
+                        <button type="button" onClick={() => removeSocial(idx)} className="inline-flex items-center gap-1 text-[11px] text-red-400 hover:text-red-300 hover:bg-red-950/20 px-1.5 py-0.5 border border-transparent hover:border-red-900/30 transition-colors"><Trash2 className="h-3 w-3" /></button>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <label className="block">
@@ -315,6 +317,17 @@ export default function AdminIndex() {
             )}
             <button type="submit" disabled={saving} className="px-4 py-2 bg-zinc-100 text-zinc-900 text-sm hover:bg-white disabled:opacity-50">{saving ? 'Saving…' : 'Update password'}</button>
           </form>
+        </div>
+      )}
+      {avatarOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setAvatarOpen(false)}>
+          <div className="relative max-w-[90vw] max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setAvatarOpen(false)} className="absolute -top-2 -right-2 h-7 w-7 bg-zinc-900 border border-zinc-700 text-zinc-400 hover:text-zinc-100 flex items-center justify-center">
+              <X className="h-4 w-4" />
+            </button>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={profile.avatar || '/avatar.jpg'} alt="avatar large" className="max-w-[90vw] max-h-[90vh] object-contain border border-zinc-700 bg-zinc-950" onError={(e) => { (e.target as HTMLImageElement).src = '/avatar.jpg' }} />
+          </div>
         </div>
       )}
     </div>
