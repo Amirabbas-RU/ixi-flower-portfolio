@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-type PlaylistTrack = { title: string; artist: string; dur: string }
+type PlaylistTrack = { title: string; artist: string; dur: string; url?: string }
 type WakaData = { total: string; daily: string; codingSince: string; age: string; langs: { name: string; pct: number }[] }
 type TechItem = { name: string; yrs: string; level: 'Advanced' | 'Intermediate' | 'Beginner'; color: string; icon: string; invert?: boolean }
 
@@ -125,7 +125,7 @@ export default function AdminSiteContentPage() {
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-bold text-zinc-100">Playlist — {playlist.length} tracks</h2>
             <button
-              onClick={() => setPlaylist((p) => [...p, { title: '', artist: 'Bahram', dur: '3:00' }])}
+              onClick={() => setPlaylist((p) => [...p, { title: '', artist: 'Bahram', dur: '3:00', url: '' }])}
               className="px-3 py-1.5 text-xs border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
             >
               + Add track
@@ -133,56 +133,14 @@ export default function AdminSiteContentPage() {
           </div>
           <div className="space-y-2">
             {playlist.map((t, i) => (
-              <div key={i} className="flex flex-wrap gap-2 items-center p-2 border border-zinc-800 bg-zinc-900">
-                <span className="text-[11px] text-zinc-600 w-6 text-center shrink-0">#{i + 1}</span>
-                <input
-                  value={t.title}
-                  onChange={(e) => setPlaylist((prev) => prev.map((x, idx) => (idx === i ? { ...x, title: e.target.value } : x)))}
-                  placeholder="Title"
-                  className="flex-1 min-w-[120px] bg-zinc-950 border border-zinc-800 px-2 py-1.5 text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600"
-                />
-                <input
-                  value={t.artist}
-                  onChange={(e) => setPlaylist((prev) => prev.map((x, idx) => (idx === i ? { ...x, artist: e.target.value } : x)))}
-                  placeholder="Artist"
-                  className="w-28 bg-zinc-950 border border-zinc-800 px-2 py-1.5 text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600"
-                />
-                <input
-                  value={t.dur}
-                  onChange={(e) => setPlaylist((prev) => prev.map((x, idx) => (idx === i ? { ...x, dur: e.target.value } : x)))}
-                  placeholder="3:16"
-                  className="w-16 bg-zinc-950 border border-zinc-800 px-2 py-1.5 text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 font-mono"
-                />
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => setPlaylist((prev) => { const a = [...prev]; if (i > 0) [a[i - 1], a[i]] = [a[i], a[i - 1]]; return a })}
-                    disabled={i === 0}
-                    className="px-2 py-1 text-[11px] border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"
-                  >
-                    ↑
-                  </button>
-                  <button
-                    onClick={() => setPlaylist((prev) => { const a = [...prev]; if (i < a.length - 1) [a[i], a[i + 1]] = [a[i + 1], a[i]]; return a })}
-                    disabled={i === playlist.length - 1}
-                    className="px-2 py-1 text-[11px] border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30"
-                  >
-                    ↓
-                  </button>
-                  <button
-                    onClick={() => setPlaylist((prev) => prev.filter((_, idx) => idx !== i))}
-                    className="px-2 py-1 text-[11px] border border-red-900/50 text-red-400 hover:bg-red-950/30"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
+              <PlaylistRow key={i} track={t} idx={i} total={playlist.length} onChange={(patch) => setPlaylist((prev) => prev.map((x, j) => (j === i ? { ...x, ...patch } : x)))} onMoveUp={() => setPlaylist((prev) => { const a = [...prev]; if (i > 0) [a[i - 1], a[i]] = [a[i], a[i - 1]]; return a })} onMoveDown={() => setPlaylist((prev) => { const a = [...prev]; if (i < a.length - 1) [a[i], a[i + 1]] = [a[i + 1], a[i]]; return a })} onRemove={() => setPlaylist((prev) => prev.filter((_, j) => j !== i))} />
             ))}
             {playlist.length === 0 && <p className="text-zinc-600 text-sm text-center py-6">No tracks — add one.</p>}
           </div>
           <button onClick={() => save('playlist', playlist)} disabled={saving} className="mt-4 px-4 py-2 bg-zinc-100 text-zinc-900 text-sm hover:bg-white disabled:opacity-50">
             {saving ? 'Saving…' : 'Save playlist'}
           </button>
-          <p className="text-[11px] text-zinc-600 mt-2 font-mono">dur must be m:ss (e.g. 3:16). Order is playlist order.</p>
+          <p className="text-[11px] text-zinc-600 mt-2 font-mono">Upload mp3/flac/ogg/m4a → Cloudinary (ixi-wave/tracks). dur m:ss. url saved per track.</p>
         </div>
       )}
 
@@ -312,6 +270,61 @@ export default function AdminSiteContentPage() {
           </button>
         </div>
       )}
+    </div>
+  )
+}
+
+function PlaylistRow({ track, idx, total, onChange, onMoveUp, onMoveDown, onRemove }: { track: PlaylistTrack; idx: number; total: number; onChange: (p: Partial<PlaylistTrack>) => void; onMoveUp: () => void; onMoveDown: () => void; onRemove: () => void }) {
+  const [uploading, setUploading] = useState(false)
+  const [upErr, setUpErr] = useState('')
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0]
+    if (!f) return
+    setUploading(true); setUpErr('')
+    try {
+      const fd = new FormData()
+      fd.append('file', f)
+      const r = await fetch('/api/admin/upload-audio', { method: 'POST', body: fd })
+      const j = await r.json().catch(() => ({}))
+      if (!r.ok) { setUpErr(j.error || 'Upload failed'); return }
+      onChange({ url: j.url as string })
+      // auto-fill title from filename if empty
+      if (!track.title) {
+        const base = f.name.replace(/\.[^.]+$/, '')
+        onChange({ title: base })
+      }
+    } catch {
+      setUpErr('Network error')
+    } finally {
+      setUploading(false)
+      e.target.value = ''
+    }
+  }
+
+  return (
+    <div className="p-2 border border-zinc-800 bg-zinc-900 space-y-2">
+      <div className="flex flex-wrap gap-2 items-center">
+        <span className="text-[11px] text-zinc-600 w-6 text-center shrink-0">#{idx + 1}</span>
+        <input value={track.title} onChange={(e) => onChange({ title: e.target.value })} placeholder="Title" className="flex-1 min-w-[120px] bg-zinc-950 border border-zinc-800 px-2 py-1.5 text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600" />
+        <input value={track.artist} onChange={(e) => onChange({ artist: e.target.value })} placeholder="Artist" className="w-28 bg-zinc-950 border border-zinc-800 px-2 py-1.5 text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600" />
+        <input value={track.dur} onChange={(e) => onChange({ dur: e.target.value })} placeholder="3:16" className="w-16 bg-zinc-950 border border-zinc-800 px-2 py-1.5 text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 font-mono" />
+        <div className="flex gap-1 shrink-0">
+          <button onClick={onMoveUp} disabled={idx === 0} className="px-2 py-1 text-[11px] border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30">↑</button>
+          <button onClick={onMoveDown} disabled={idx === total - 1} className="px-2 py-1 text-[11px] border border-zinc-800 text-zinc-400 hover:bg-zinc-800 disabled:opacity-30">↓</button>
+          <button onClick={onRemove} className="px-2 py-1 text-[11px] border border-red-900/50 text-red-400 hover:bg-red-950/30">✕</button>
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-2 items-center">
+        <input value={track.url || ''} onChange={(e) => onChange({ url: e.target.value })} placeholder="https://res.cloudinary.com/.../track.mp3  (or upload →)" className="flex-1 min-w-[200px] bg-zinc-950 border border-zinc-800 px-2 py-1.5 text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 font-mono" />
+        <label className={`px-3 py-1.5 text-xs border cursor-pointer ${uploading ? 'bg-zinc-800 border-zinc-700 text-zinc-500' : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:bg-zinc-700'}`}>
+          {uploading ? 'Uploading…' : 'Upload audio'}
+          <input type="file" accept="audio/*,.mp3,.wav,.flac,.ogg,.m4a,.aac" onChange={handleFile} disabled={uploading} className="hidden" />
+        </label>
+        {track.url && <span className="text-[11px] text-emerald-400 font-mono truncate max-w-[160px]">✓ {track.url.slice(0, 40)}…</span>}
+      </div>
+      {upErr && <p className="text-[11px] text-red-400 font-mono">{upErr}</p>}
+      {track.url && <audio controls src={track.url} className="w-full h-7 mt-1" preload="none" />}
     </div>
   )
 }

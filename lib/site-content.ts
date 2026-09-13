@@ -14,6 +14,7 @@ export const playlistSchema = z
       title: z.string().min(1).max(120),
       artist: z.string().max(120).default(""),
       dur: z.string().regex(/^\d+:\d{2}$/, "dur must be m:ss like 3:16"),
+      url: z.string().url().max(2000).optional().or(z.literal("")),
     }),
   )
   .max(100);

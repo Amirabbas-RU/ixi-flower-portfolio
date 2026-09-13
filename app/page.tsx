@@ -47,7 +47,8 @@ const WAKA = {
   ],
 };
 
-const PLAYLIST = [
+type PlaylistTrack = { title: string; artist: string; dur: string; url?: string };
+const PLAYLIST: PlaylistTrack[] = [
   { title: "AYNEH", artist: "Bahram", dur: "3:16" },
   { title: "Enfejare Rangha", artist: "Bahram", dur: "4:02" },
   { title: "Gole Sorkh", artist: "Bahram", dur: "3:48" },
@@ -481,9 +482,18 @@ function Card({ className, children }: { className?: string; children: React.Rea
   );
 }
 
+function fmtTime(s: number) {
+  if (!isFinite(s) || s <= 0) return "0:00";
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}:${String(sec).padStart(2, "0")}`;
+}
+
 export default function Home() {
   const [cur, setCur] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const [langTab, setLangTab] = useState<"languages" | "editors" | "os">("languages");
   const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
   const [blogsExpanded, setBlogsExpanded] = useState(false);
@@ -510,6 +520,13 @@ export default function Home() {
       })
       .catch(() => {});
   }, []);
+
+  // keep audio in sync with play/cur state (auto-play next track)
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    if (playing && el.src) el.play().catch(() => {});
+  }, [cur, playing]);
 
   return (
     <main className="min-h-screen bg-zinc-950 text-zinc-200 p-3 font-mono">
@@ -754,56 +771,98 @@ export default function Home() {
             );
           })()}
 
-          {/* MUSIC */}
+          {/* MUSIC — real <audio> wired to Cloudinary urls, progress + seek + auto-next */}
           {(() => {
             const pl = sitePlaylist ?? PLAYLIST;
             const curTrack = pl[cur] ?? pl[0];
+            const hasUrl = !!curTrack.url;
+            const pct = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+            // effect wiring inside IIFE scope via refs — attach inline handlers below
             return (
           <Card className="md:col-span-2">
             <Prompt cmd="mpv --playlist favorites.m3u" />
+            <audio
+              ref={audioRef}
+              src={curTrack.url || undefined}
+              preload="metadata"
+              onTimeUpdate={(e) => setCurrentTime((e.target as HTMLAudioElement).currentTime)}
+              onLoadedMetadata={(e) => setDuration((e.target as HTMLAudioElement).duration)}
+              onEnded={() => {
+                setCur((c) => (c + 1) % pl.length);
+                setPlaying(true);
+              }}
+              onPlay={() => setPlaying(true)}
+              onPause={() => setPlaying(false)}
+            />
             <div className="space-y-2">
               <div className="bg-zinc-900 border border-zinc-800 p-2 flex items-center gap-2">
                 <div className="h-10 w-10 bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-400">♪</div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-bold text-zinc-100 truncate">{curTrack.title}</div>
-                  <div className="text-xs text-zinc-400 truncate">{curTrack.artist} — 0:00 / {curTrack.dur}</div>
-                  <div className="h-1 bg-zinc-800 mt-1">
-                    <div className="h-1 bg-zinc-300" style={{ width: playing ? "38%" : "0%" }} />
+                  <div className="text-xs text-zinc-400 truncate">
+                    {curTrack.artist} — {hasUrl ? `${fmtTime(currentTime)} / ${duration ? fmtTime(duration) : curTrack.dur}` : curTrack.dur}
+                    {!hasUrl && <span className="text-amber-400 ml-1">(no audio)</span>}
+                  </div>
+                  <div
+                    className="h-1 bg-zinc-800 mt-1 cursor-pointer"
+                    onClick={(e) => {
+                      if (!hasUrl || !duration || !audioRef.current) return;
+                      const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+                      const frac = (e.clientX - rect.left) / rect.width;
+                      audioRef.current.currentTime = frac * duration;
+                    }}
+                  >
+                    <div className="h-1 bg-zinc-300 transition-[width] duration-100" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
                 <div className="flex gap-1">
-                  <button onClick={() => setCur((c) => (c - 1 + pl.length) % pl.length)} className="h-7 w-7 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 flex items-center justify-center">
+                  <button
+                    onClick={() => setCur((c) => (c - 1 + pl.length) % pl.length)}
+                    className="h-7 w-7 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 flex items-center justify-center"
+                  >
                     ◀
                   </button>
                   <button
-                    onClick={() => setPlaying((p) => !p)}
-                    className="h-7 w-7 border border-zinc-700 bg-zinc-100 text-zinc-900 flex items-center justify-center"
+                    onClick={() => {
+                      if (!hasUrl) return;
+                      if (playing) audioRef.current?.pause();
+                      else audioRef.current?.play().catch(() => {});
+                    }}
+                    disabled={!hasUrl}
+                    className={`h-7 w-7 border flex items-center justify-center ${hasUrl ? "border-zinc-700 bg-zinc-100 text-zinc-900 hover:bg-white" : "border-zinc-800 bg-zinc-800 text-zinc-600 cursor-not-allowed"}`}
                   >
                     {playing ? "❚❚" : "▶"}
                   </button>
-                  <button onClick={() => setCur((c) => (c + 1) % pl.length)} className="h-7 w-7 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 flex items-center justify-center">
+                  <button
+                    onClick={() => setCur((c) => (c + 1) % pl.length)}
+                    className="h-7 w-7 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 flex items-center justify-center"
+                  >
                     ▶
                   </button>
                 </div>
               </div>
               <div className="flex justify-between text-[10px] text-zinc-500">
                 <span>Playlist</span>
-                <span>{pl.length} tracks</span>
+                <span>{pl.length} tracks{hasUrl ? "" : " · upload audio in /admin/site-content"}</span>
               </div>
               <div className="relative">
                 <div className="max-h-[220px] overflow-y-auto custom-scrollbar space-y-1 pr-1 pb-6">
                   {pl.map((t, i) => (
                   <button
-                    key={t.title}
+                    key={`${t.title}-${i}`}
                     onClick={() => {
                       setCur(i);
-                      setPlaying(true);
+                      // play will trigger via effect when src changes; nudge play after tick if url exists
+                      if (t.url) setTimeout(() => audioRef.current?.play().catch(() => {}), 80);
+                      else setPlaying(false);
                     }}
                     className={`w-full flex items-center justify-between p-1.5 border text-left rounded-none transition-colors ${i === cur ? "bg-zinc-800 border-zinc-600 text-zinc-100" : "bg-zinc-800/50 border-zinc-700 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"}`}
                   >
                     <span className="flex items-center gap-2 min-w-0">
                       <span className="h-6 w-6 bg-zinc-900 border border-zinc-700 flex items-center justify-center text-[10px] shrink-0">♪</span>
                       <span className="text-xs truncate">{t.title}</span>
+                      {t.url ? <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" title="audio ready" /> : null}
                     </span>
                     <span className="text-[10px] shrink-0 ml-2">{t.dur}</span>
                   </button>
